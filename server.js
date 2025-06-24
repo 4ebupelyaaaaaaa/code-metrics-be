@@ -15,7 +15,6 @@ app.use(
     credentials: true,
   })
 );
-app.options("*", cors());
 
 // JSON parser
 app.use(express.json());
