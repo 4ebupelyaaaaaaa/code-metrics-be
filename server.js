@@ -21,27 +21,54 @@ app.options("*", cors());
 app.use(express.json());
 
 // Роуты
+// Аутентификация
 const { router: authRouter, authCheck } = require("./routes/auth.routes");
+
+// Наши новые роуты
+const cyclomaticRouter = require("./routes/cyclomatic.routes");
+const nestingRouter = require("./routes/nesting.routes");
+const depthRouter = require("./routes/depth.routes");
+const cognitiveRouter = require("./routes/cognitive.routes");
+const inheritanceRouter = require("./routes/inheritance.routes.js");
+const maintainabilityRouter = require("./routes/maintainability.routes.js");
+const commentsRouter = require("./routes/comments.routes.js");
+const readabilityRouter = require("./routes/readability.routes.js");
+const historyRouter = require("./routes/history.routes.js");
+const reportRouter = require("./routes/report.routes.js");
+
+// CORS — разрешаем фронту обращаться к API
+app.use(
+  cors({
+    origin: "http://localhost:8080", // адрес вашего фронта
+    credentials: true,
+  })
+);
+
+// Для парсинга JSON в теле запроса
+app.use(express.json());
+
+// --- Маршруты аутентификации ---
 app.use("/api/auth", authRouter);
 app.get("/api/protected", authCheck, (req, res) => {
   res.json({ message: `Вы вошли как ${req.user.login}` });
 });
 
-app.use("/api/report/cyclomatic", require("./routes/cyclomatic.routes"));
-app.use("/api/report/nesting", require("./routes/nesting.routes"));
-app.use("/api/report/depth", require("./routes/depth.routes"));
-app.use("/api/report/cognitive", require("./routes/cognitive.routes"));
-app.use("/api/report/inheritance", require("./routes/inheritance.routes"));
-app.use(
-  "/api/report/maintainability",
-  require("./routes/maintainability.routes")
-);
-app.use("/api/report/comments", require("./routes/comments.routes"));
-app.use("/api/report/readability", require("./routes/readability.routes"));
-app.use("/api/history", require("./routes/history.routes"));
-app.use("/api/report/full", require("./routes/report.routes"));
+// --- Маршруты для отчётов ---
+// POST /api/report/cyclomatic  — анализ цикломатической сложности
+// POST /api/report/nesting     — анализ глубины вложенности
+app.use("/api/report", cyclomaticRouter);
+app.use("/api/report", nestingRouter);
+app.use("/api/report", depthRouter);
+app.use("/api/report", cognitiveRouter);
+app.use("/api/report", inheritanceRouter);
+app.use("/api/report", maintainabilityRouter);
+app.use("/api/report", commentsRouter);
+app.use("/api/report", readabilityRouter);
+app.use("/api/report", readabilityRouter);
+app.use("/api/history", historyRouter);
+app.use("/api/report", reportRouter);
 
-// Статика PDF
+// Статика для скачивания PDF
 app.use(
   "/static/reports",
   express.static(path.join(__dirname, "static/reports"))

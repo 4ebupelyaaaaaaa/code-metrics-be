@@ -23,13 +23,6 @@ router.get("/:userId", async (req, res, next) => {
   }
 });
 
-// POST /users/:userId/history
-// Body JSON:
-// {
-//   "project_name": "...",
-//   "analysis_date": "2025-05-21T11:00:00.000Z",
-//   "report_pdf": "https://example.com/report.pdf"
-// }
 router.post("/:userId", async (req, res, next) => {
   try {
     const userId = Number(req.params.userId);
