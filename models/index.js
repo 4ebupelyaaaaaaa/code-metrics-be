@@ -1,6 +1,8 @@
-const { Sequelize } = require("sequelize");
+// models/index.js
+const { Sequelize, DataTypes } = require("sequelize");
 const cfg = require("../config/db.config");
 
+// создаём подключение
 let sequelize;
 if (cfg.url) {
   sequelize = new Sequelize(cfg.url, {
@@ -15,10 +17,10 @@ if (cfg.url) {
   });
 }
 
-// Используем фабрику модели User и AnalysisHistory
+// и только теперь передаём инициализацию моделей
 const { User, AnalysisHistory } = require("./user.model")(sequelize, DataTypes);
 
-// Собираем объект db
+// собираем объект для экспорта
 const db = {
   Sequelize,
   sequelize,
@@ -26,4 +28,4 @@ const db = {
   AnalysisHistory,
 };
 
-module.exports = { Sequelize, sequelize, db };
+module.exports = db;
