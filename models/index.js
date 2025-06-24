@@ -1,9 +1,11 @@
-const { Sequelize } = require("sequelize");
+// models/index.js
+require("dotenv").config();
+const { Sequelize, DataTypes } = require("sequelize"); // <-- добавили DataTypes
 const cfg = require("../config/db.config");
 
 let sequelize;
 if (cfg.url) {
-  // если Supabase даёт нам postgresql://..., заменим его на postgres://
+  // Supabase даёт postgresql://… — заменим на postgres://
   let url = cfg.url;
   if (url.startsWith("postgresql://")) {
     url = url.replace(/^postgresql:\/\//, "postgres://");
@@ -17,13 +19,13 @@ if (cfg.url) {
     host: cfg.host,
     port: cfg.port,
     dialect: "postgres",
+    dialectOptions: cfg.dialectOptions,
   });
 }
 
-// и только теперь передаём инициализацию моделей
+// Теперь DataTypes определён, и мы можем инициализировать модели:
 const { User, AnalysisHistory } = require("./user.model")(sequelize, DataTypes);
 
-// собираем объект для экспорта
 const db = {
   Sequelize,
   sequelize,
