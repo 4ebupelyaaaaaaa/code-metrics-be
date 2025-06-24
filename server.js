@@ -1,5 +1,9 @@
-// app.js
+// 1) Конфиги и форс IPv4
 require("dotenv").config();
+const dns = require("dns");
+if (dns.setDefaultResultOrder) dns.setDefaultResultOrder("ipv4first");
+
+// 2) Приложение и CORS
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
