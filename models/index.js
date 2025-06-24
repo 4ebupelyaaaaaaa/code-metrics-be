@@ -1,36 +1,40 @@
 // models/index.js
 require("dotenv").config();
-const { Sequelize, DataTypes } = require("sequelize"); // <-- добавили DataTypes
-const cfg = require("../config/db.config");
+const { Sequelize, DataTypes } = require("sequelize");
+
+// Вычитываем прямо из process.env
+const { DATABASE_URL, DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD } =
+  process.env;
 
 let sequelize;
-if (cfg.url) {
-  // Supabase даёт postgresql://… — заменим на postgres://
-  let url = cfg.url;
-  if (url.startsWith("postgresql://")) {
-    url = url.replace(/^postgresql:\/\//, "postgres://");
-  }
+
+if (DATABASE_URL) {
+  // Supabase дает postgresql://…, а sequelize ожидает postgres://…
+  const url = DATABASE_URL.replace(/^postgresql:\/\//i, "postgres://");
   sequelize = new Sequelize(url, {
     dialect: "postgres",
-    dialectOptions: cfg.dialectOptions,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        // если самоподписанный сертификат:
+        rejectUnauthorized: false,
+      },
+    },
+    logging: false, // можно убрать, если хотите логи SQL
   });
 } else {
-  sequelize = new Sequelize(cfg.database, cfg.username, cfg.password, {
-    host: cfg.host,
-    port: cfg.port,
+  // локальное подключение
+  sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+    host: DB_HOST || "localhost",
+    port: parseInt(DB_PORT, 10) || 5432,
     dialect: "postgres",
-    dialectOptions: cfg.dialectOptions,
+    logging: false,
   });
 }
 
-// Теперь DataTypes определён, и мы можем инициализировать модели:
+// теперь инициализируем модели:
 const { User, AnalysisHistory } = require("./user.model")(sequelize, DataTypes);
 
-const db = {
-  Sequelize,
-  sequelize,
-  User,
-  AnalysisHistory,
-};
+const db = { sequelize, Sequelize, User, AnalysisHistory };
 
 module.exports = db;
