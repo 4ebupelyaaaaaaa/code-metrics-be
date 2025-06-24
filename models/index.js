@@ -1,19 +1,22 @@
-// models/index.js
-const { Sequelize, DataTypes } = require("sequelize");
+const { Sequelize } = require("sequelize");
 const cfg = require("../config/db.config");
 
-// создаём подключение
 let sequelize;
 if (cfg.url) {
-  sequelize = new Sequelize(cfg.url, {
-    dialect: cfg.dialect,
+  // если Supabase даёт нам postgresql://..., заменим его на postgres://
+  let url = cfg.url;
+  if (url.startsWith("postgresql://")) {
+    url = url.replace(/^postgresql:\/\//, "postgres://");
+  }
+  sequelize = new Sequelize(url, {
+    dialect: "postgres",
     dialectOptions: cfg.dialectOptions,
   });
 } else {
   sequelize = new Sequelize(cfg.database, cfg.username, cfg.password, {
     host: cfg.host,
     port: cfg.port,
-    dialect: cfg.dialect,
+    dialect: "postgres",
   });
 }
 
