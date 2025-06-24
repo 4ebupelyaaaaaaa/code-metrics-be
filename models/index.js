@@ -1,17 +1,19 @@
-const { Sequelize, DataTypes } = require("sequelize");
-const dbConfig = require("../config/db.config");
+const { Sequelize } = require("sequelize");
+const cfg = require("../config/db.config");
 
-// Инициализируем Sequelize с параметрами из конфига
-const sequelize = new Sequelize(
-  dbConfig.database,
-  dbConfig.username,
-  dbConfig.password,
-  {
-    host: dbConfig.host,
-    port: dbConfig.port,
-    dialect: dbConfig.dialect,
-  }
-);
+let sequelize;
+if (cfg.url) {
+  sequelize = new Sequelize(cfg.url, {
+    dialect: cfg.dialect,
+    dialectOptions: cfg.dialectOptions,
+  });
+} else {
+  sequelize = new Sequelize(cfg.database, cfg.username, cfg.password, {
+    host: cfg.host,
+    port: cfg.port,
+    dialect: cfg.dialect,
+  });
+}
 
 // Используем фабрику модели User и AnalysisHistory
 const { User, AnalysisHistory } = require("./user.model")(sequelize, DataTypes);
@@ -24,4 +26,4 @@ const db = {
   AnalysisHistory,
 };
 
-module.exports = db;
+module.exports = { Sequelize, sequelize, db };
