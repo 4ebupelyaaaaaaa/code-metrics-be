@@ -16,13 +16,6 @@ app.use(
   })
 );
 
-app.options(
-  "*",
-  cors({
-    origin: FRONTEND_URL,
-    credentials: true,
-  })
-);
 
 // JSON parser
 app.use(express.json());
