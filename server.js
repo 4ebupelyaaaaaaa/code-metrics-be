@@ -16,6 +16,14 @@ app.use(
   })
 );
 
+app.options(
+  "*",
+  cors({
+    origin: FRONTEND_URL,
+    credentials: true,
+  })
+);
+
 // JSON parser
 app.use(express.json());
 
@@ -34,14 +42,6 @@ const commentsRouter = require("./routes/comments.routes.js");
 const readabilityRouter = require("./routes/readability.routes.js");
 const historyRouter = require("./routes/history.routes.js");
 const reportRouter = require("./routes/report.routes.js");
-
-// CORS — разрешаем фронту обращаться к API
-app.use(
-  cors({
-    origin: "http://localhost:8080", // адрес вашего фронта
-    credentials: true,
-  })
-);
 
 // Для парсинга JSON в теле запроса
 app.use(express.json());
